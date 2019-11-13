@@ -45,7 +45,7 @@ class Lexer():
    def retornaPonteiro(self):
       if(self.lookahead.decode('ascii') != ''):
          self.input_file.seek(self.input_file.tell()-1)
-         #self.n_column -= 1
+         self.n_column -= 1
 
    def printTS(self):
       self.ts.printTS()
@@ -67,8 +67,10 @@ class Lexer():
                if(c == '\n'):
                   self.n_line += 1
                   self.n_column = 1
-               elif(c == ' '):
+               elif(c == ' ' or '\r'):
                   self.n_column += 1
+               elif(c == '\t'):
+                  self.n_column += 3
             elif(c == '#'):#--------------Q24
                estado = 24
                self.n_column += 1
@@ -272,6 +274,8 @@ class Lexer():
             elif(c == '\n'):
                self.sinalizaErroLexico("Só é permitido String de uma Linha! Erro na linha " +
                str(self.n_line) + " e coluna " + str(self.n_column))
+               self.n_column = 1
+               self.n_line += 1
             else:#--------------Q22
                lexema += c
                estado = 21
