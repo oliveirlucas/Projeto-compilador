@@ -267,9 +267,7 @@ class Lexer():
          elif(estado == 21):
             if(c == '"'):#--------------Q23
                self.n_column += 1
-               token = Token(Tag.CONST_STRING, lexema, self.n_line, self.n_column)
-               self.ts.addToken(lexema, token)
-               return token
+               return Token(Tag.CONST_STRING, lexema, self.n_line, self.n_column)
 
             elif(c == '\n'):
                self.sinalizaErroLexico("Só é permitido String de uma Linha! Erro na linha " +
@@ -278,7 +276,6 @@ class Lexer():
                self.n_line += 1
             else:#--------------Q22
                lexema += c
-               estado = 21
                self.n_column += 1
          elif(estado == 24):
             if(c == '\n'):#--------------Q0

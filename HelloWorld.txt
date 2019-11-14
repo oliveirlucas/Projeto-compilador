@@ -1,6 +1,14 @@
 class teste:
-	defstatic void main(string [] args):
-		string a;
-		a = "Hello World";
+
+	def bool ola(String hello):
+		if (hello = "Hello World" ):
+			return true
+	end;
+
+	defstatic void main(String [] args):
+		String hello;
+		hello = "Hello World";
+
+		ola(hello)
 	end;
 end.
