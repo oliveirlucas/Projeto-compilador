@@ -1,14 +1,20 @@
 class teste:
 
 	def bool ola(String hello):
-		if (hello = "Hello World" ):
-			return true
+		String world;
+		world = "Hello World";
+
+		if(world == hello):
+			write("VERDADEIRO");
+		end;
+
+		return true;
 	end;
 
 	defstatic void main(String [] args):
 		String hello;
 		hello = "Hello World";
 
-		ola(hello)
+		ola(hello);
 	end;
 end.

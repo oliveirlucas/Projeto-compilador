@@ -163,7 +163,7 @@ class Parser():
          
          self.RegexDeclaraId()
          self.ListaCmd()
-         self.retorno()
+         self.Retorno()
 
          if(not self.eat(Tag.KW_END)):
             self.sinalizaErroSintatico("Esperado\"end\"; encontrado" "+" "\""+ self.token.getLexema() + "\"")
@@ -201,7 +201,7 @@ class Parser():
       if(self.token.getNome() == Tag.KW_BOOL or self.token.getNome() == Tag.KW_INTEGER or self.token.getNome() == Tag.KW_STRING or self.token.getNome() == Tag.KW_DOUBLE or self.token.getNome() == Tag.KW_VOID):
          self.Arg()
 
-         self.ListaFuncaoLinha()
+         self.ListaArgLinha()
 
       # Synch: FOLLOW de ListaArg
       else:
@@ -220,7 +220,7 @@ class Parser():
 
          self.ListaArg
       
-      elif(self.token.getNome() == Tag.SIMB_ABRE_PARENTESES):
+      elif(self.token.getNome() == Tag.SIMB_FECHA_PARENTESES):
          return
 
       else:
@@ -233,7 +233,7 @@ class Parser():
       if(self.token.getNome() == Tag.KW_BOOL or self.token.getNome() == Tag.KW_INTEGER or self.token.getNome() == Tag.KW_STRING or self.token.getNome() == Tag.KW_DOUBLE or self.token.getNome() == Tag.KW_VOID):
          self.TipoPrimitivo()
 
-         if(self.eat(Tag.ID)):
+         if(not self.eat(Tag.ID)):
             self.sinalizaErroSintatico("Esperado\"ID\"; encontrado" "+" "\""+ self.token.getLexema() + "\"")
 
       # Synch: FOLLOW de Arg
@@ -249,7 +249,6 @@ class Parser():
    # Retorno → "return" Expressao ";" | ε 
    def Retorno(self):
       if(self.eat(Tag.KW_RETURN)):
-         self.sinalizaErroSintatico("Esperado\"return\"; encontrado" "+" "\""+ self.token.getLexema() + "\"")
          
          self.Expressao()
 
@@ -260,7 +259,7 @@ class Parser():
          return
       
       else:
-            self.skip("Esperado\"return ou ε\"; encontrado" "+" "\""+ self.token.getLexema() + "\"")
+            self.skip("Esperado\"return ou ε\"; encontrado" + "\""+ self.token.getLexema() + "\"")
             if(self.token.getNome() != Tag.EOF):
                self.Retorno()
 
@@ -343,7 +342,7 @@ class Parser():
 
    # ListaCmd → ListaCmd’ 
    def ListaCmd(self):
-      if(self.token.getNome() == Tag.KW_IF or self.token.getNome() == Tag.KW_WHILE or self.token.getNome() == Tag.ID or self.token.getNome() == Tag.KW_WRITE):
+      if(self.token.getNome() == Tag.KW_IF or self.token.getNome() == Tag.KW_WHILE or self.token.getNome() == Tag.ID or self.token.getNome() == Tag.KW_WRITE or self.token.getNome() == Tag.KW_RETURN):
          self.ListaCmdLinha()
 
       # Synch: FOLLOW de ListaCmd
@@ -360,7 +359,7 @@ class Parser():
    def ListaCmdLinha(self):
       if(self.token.getNome() == Tag.KW_IF or self.token.getNome() == Tag.KW_WHILE or self.token.getNome() == Tag.ID or self.token.getNome() == Tag.KW_WRITE):
          self.Cmd()
-         self.ListaCmdLinha
+         self.ListaCmdLinha()
       
       elif(self.token.getNome() == Tag.KW_RETURN or self.token.getNome() == Tag.KW_END or self.token.getNome() == Tag.KW_ELSE):
          return
