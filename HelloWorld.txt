@@ -15,6 +15,15 @@ class teste:
 		String hello;
 		hello = "Hello World";
 
+		write("Caros alunos de Compiladores,");
+			write("");
+			write("Este eh um codigo de exemplo em Pyscal!");
+			write("");
+			
+			if(podeEntregarDepois(true)):
+				write("Pode, mas nao tem ponto.");
+			end;
+
 		ola(hello);
 	end;
 end.
