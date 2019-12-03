@@ -31,6 +31,10 @@ class Parser():
       self.lexer = lexer
       self.token = lexer.proxToken() # Leitura inicial obrigatoria do primeiro SIMB
 
+   def sinalizaErroSemantico(self, message):
+      print("[Erro Semantico] na linha " + str(self.token.getLinha()) + " e coluna " + str(self.token.getColuna()) + ": ")
+      print(message, "\n")
+
    def sinalizaErroSintatico(self, message):
       print("[Erro Sintatico] na linha " + str(self.token.getLinha()) + " e coluna " + str(self.token.getColuna()) + ": ")
       print(message, "\n")
@@ -67,7 +71,9 @@ class Parser():
       if(self.eat(Tag.KW_CLASS)):
          
          if(not self.eat(Tag.ID)):
-            self.sinalizaErroSintatico("Esperado\"ID\"; encontrado" + "\""+ self.token.getLexema() + "\"")       
+            self.sinalizaErroSintatico("Esperado\"ID\"; encontrado" + "\""+ self.token.getLexema() + "\"")    
+         else:
+            self.lexer.ts.   
          
          if(not self.eat(Tag.SIMB_DOIS_PONTOS)):
             self.sinalizaErroSintatico("Esperado\":\"; encontrado" + "\""+ self.token.getLexema() + "\"")        
