@@ -1,4 +1,5 @@
 import sys
+import copy
 
 from ts import TS
 from tag import Tag
@@ -70,11 +71,13 @@ class Parser():
    # Classe ->  "class" ID ":" ListaFuncao  Main "end" "." 
    def Classe(self):
       if(self.eat(Tag.KW_CLASS)):
+
+         tempToken = copy.copy(self.token)
          
          if(not self.eat(Tag.ID)):
             self.sinalizaErroSintatico("Esperado\"ID\"; encontrado" + "\""+ self.token.getLexema() + "\"")
          else:
-
+            self.lexer.ts.setTipo(tempToken.getLexema(), Tag.TIPOVAZIO)
          
          if(not self.eat(Tag.SIMB_DOIS_PONTOS)):
             self.sinalizaErroSintatico("Esperado\":\"; encontrado" + "\""+ self.token.getLexema() + "\"")        
@@ -154,12 +157,15 @@ class Parser():
    # Funcao ->"def" TipoPrimitivo ID "(" ListaArg ")" ":" RegexDeclaraId ListaCmd Retorno "end" ";" 
    def Funcao(self):
       if(self.eat(Tag.KW_DEF)):
-         #self.sinalizaErroSintatico("Esperado\"def\"; encontrado" "+" "\""+ self.token.getLexema() + "\"")
 
-         self.TipoPrimitivo()
+         noTipoPrimitivo = self.TipoPrimitivo()
+
+         tempToken = copy.copy(self.token)
 
          if(not self.eat(Tag.ID)):
             self.sinalizaErroSintatico("Esperado\"ID\"; encontrado" "+" "\""+ self.token.getLexema() + "\"")
+         else:
+            self.lexer.ts.setTipo(tempToken.getLexema(), noTipoPrimitivo.getTipo())
          
          if(not self.eat(Tag.SIMB_ABRE_PARENTESES)):
             self.sinalizaErroSintatico("Esperado\"(\"; encontrado" "+" "\""+ self.token.getLexema() + "\"")
@@ -176,7 +182,9 @@ class Parser():
          self.ListaCmd()
 
          noRetorno = self.Retorno()
-         if(noRetorno)
+         if(noRetorno.getTipo() != noTipoPrimitivo.getTipo()):
+            self.sinalizaErroSemantico("Tipo de retorno incompativel")
+
 
          if(not self.eat(Tag.KW_END)):
             self.sinalizaErroSintatico("Esperado\"end\"; encontrado" "+" "\""+ self.token.getLexema() + "\"")
@@ -244,10 +252,14 @@ class Parser():
    # Arg → TipoPrimitivo ID
    def Arg(self):
       if(self.token.getNome() == Tag.KW_BOOL or self.token.getNome() == Tag.KW_INTEGER or self.token.getNome() == Tag.KW_STRING or self.token.getNome() == Tag.KW_DOUBLE or self.token.getNome() == Tag.KW_VOID):
-         self.TipoPrimitivo()
+         noTipoPrimitivo = self.TipoPrimitivo()
+
+         tempToken = copy.copy(self.token)
 
          if(not self.eat(Tag.ID)):
             self.sinalizaErroSintatico("Esperado\"ID\"; encontrado" "+" "\""+ self.token.getLexema() + "\"")
+         else:
+            self.lexer.ts.setTipo(tempToken.getLexema(), noTipoPrimitivo.getTipo())
 
       # Synch: FOLLOW de Arg
       else:
@@ -297,9 +309,13 @@ class Parser():
          
          if(not self.eat(Tag.SIMB_FECHA_COLCHETES)):
             self.sinalizaErroSintatico("Esperado\"]\"; encontrado" "+" "\""+ self.token.getLexema() + "\"")
+
+         tempToken = copy.copy(self.token)
          
          if(not self.eat(Tag.ID)):
             self.sinalizaErroSintatico("Esperado\"ID\"; encontrado" "+" "\""+ self.token.getLexema() + "\"")
+         else:
+            self.lexer.ts.setTipo(tempToken.getLexema(), Tag.TIPOSTRING)
          
          if(not self.eat(Tag.SIMB_FECHA_PARENTESES)):
             self.sinalizaErroSintatico("Esperado\")\"; encontrado" "+" "\""+ self.token.getLexema() + "\"")
@@ -353,11 +369,12 @@ class Parser():
       else:
          if(self.token.getNome() == Tag.ID):
             self.sinalizaErroSintatico("Esperado\"bool, interger, String, double, void\"; encontrado" "+" "\""+ self.token.getLexema() + "\"")
-            return
+            return noTipoPrimitivo
          else:
             self.skip("Esperado\"bool, interger, String, double, void\"; encontrado" "+" "\""+ self.token.getLexema() + "\"")
             if(self.token.getNome() != Tag.EOF):
-               self.TipoPrimitivo()
+               return self.TipoPrimitivo()
+      return noTipoPrimitivo
 
    # ListaCmd → ListaCmd’ 
    def ListaCmd(self):
@@ -396,9 +413,19 @@ class Parser():
       elif(self.token.getNome() == Tag.KW_WHILE):
          self.CmdWhile()
       
+      tempToken = copy.copy(self.token)
+
       elif(self.token.getNome() == Tag.ID):
          self.eat(Tag.ID)
-         self.CmdAtribFunc()
+
+         if(self.lexer.ts.getTipo(tempToken.getLexema() is None):
+            self.sinalizaErroSemantico("ID não declarado")
+
+         noCmdAtribFunc = self.CmdAtribFunc()
+
+         if(noCmdAtribFunc.getTipo() != Tag.TIPOVAZIO and self.lexer.ts.getTipo(tempToken.getLexema() != noCmdAtribFunc.getTipo()):
+            self.sinalizaErroSemantico("Atribuição incompatível")
+
       
       elif(self.token.getNome() == Tag.KW_WRITE):
          self.CmdWrite()
@@ -415,17 +442,23 @@ class Parser():
 
    # CmdAtribFunc→ CmdAtribui | CmdFuncao
    def CmdAtribFunc(self):
+      noCmdAtribFunc = No()
+
       if(self.token.getNome() == Tag.OP_ATRIBUI):
-         self.CmdAtribui()
+         noCmdAtribui = self.CmdAtribui()
+      else:
+         noCmdAtribFunc == noCmdAtribui
       
       elif(self.token.getNome() == Tag.SIMB_ABRE_PARENTESES):
          self.CmdFuncao()
+      else:
+         noCmdAtribFunc == Tag.TIPOVAZIO
 
       # Synch: FOLLOW de CmdAtribFunc
       else:
          if(self.token.getNome() == Tag.KW_IF or self.token.getNome() == Tag.KW_WHILE or self.token.getNome() == Tag.ID or self.token.getNome() == Tag.KW_WRITE or self.token.getNome() == Tag.KW_RETURN or self.token.getNome() == Tag.KW_END or self.token.getNome() == Tag.KW_ELSE):
             self.sinalizaErroSintatico("Esperado\" = ou (\"; encontrado" "+" "\""+ self.token.getLexema() + "\"")
-            return
+            return 
          else:
             self.skip("Esperado\"= ou (\"; encontrado" "+" "\""+ self.token.getLexema() + "\"")
             if(self.token.getNome() != Tag.EOF):
@@ -438,10 +471,13 @@ class Parser():
          if(not self.eat(Tag.SIMB_ABRE_PARENTESES)):
             self.sinalizaErroSintatico("Esperado\"(\"; encontrado" "+" "\""+ self.token.getLexema() + "\"")
          
-         self.Expressao()
+         noExpressao = self.Expressao()
 
          if(not self.eat(Tag.SIMB_FECHA_PARENTESES)):
             self.sinalizaErroSintatico("Esperado\")\"; encontrado" "+" "\""+ self.token.getLexema() + "\"")
+            
+         if(noExpressao.getTipo() != Tag.TIPOLOGICO):
+            self.sinalizaErroSemantico("Erro Logico")
          
          if(not self.eat(Tag.SIMB_DOIS_PONTOS)):
             self.sinalizaErroSintatico("Esperado\":\"; encontrado" "+" "\""+ self.token.getLexema() + "\"")
@@ -497,10 +533,13 @@ class Parser():
          if(not self.eat(Tag.SIMB_ABRE_PARENTESES)):
             self.sinalizaErroSintatico("Esperado\"(\"; encontrado" "+" "\""+ self.token.getLexema() + "\"")
          
-         self.Expressao()
+         noExpressao = self.Expressao()
 
          if(not self.eat(Tag.SIMB_FECHA_PARENTESES)):
             self.sinalizaErroSintatico("Esperado\")\"; encontrado" "+" "\""+ self.token.getLexema() + "\"")
+         
+         if(noExpressao.getTipo() != Tag.TIPOLOGICO):
+            self.sinalizaErroSemantico("Erro Logico")
 
          if(not self.eat(Tag.SIMB_DOIS_PONTOS)):
             self.sinalizaErroSintatico("Esperado\"(:)\"; encontrado" "+" "\""+ self.token.getLexema() + "\"")
@@ -530,10 +569,13 @@ class Parser():
          if(not self.eat(Tag.SIMB_ABRE_PARENTESES)):
             self.sinalizaErroSintatico("Esperado\"(\"; encontrado" "+" "\""+ self.token.getLexema() + "\"")
          
-         self.Expressao()
+         noExpressao = self.Expressao()
 
          if(not self.eat(Tag.SIMB_FECHA_PARENTESES)):
             self.sinalizaErroSintatico("Esperado\")\"; encontrado" "+" "\""+ self.token.getLexema() + "\"")
+         
+         if(noExpressao.getTipo() != Tag.TIPOSTRING):
+            self.sinalizaErroSemantico("Erro Logico")
          
          if(not self.eat(Tag.SIMB_PONTO_VIRGULA)):
             self.sinalizaErroSintatico("Esperado\"(;)\"; encontrado" "+" "\""+ self.token.getLexema() + "\"")
@@ -550,11 +592,15 @@ class Parser():
 
    # CmdAtribui → "=" Expressao ";"
    def CmdAtribui(self):
+      noCmdAtribui = No()
+
       if(self.eat(Tag.OP_ATRIBUI)):
-         self.Expressao()
+         noExpressao = self.Expressao()
 
          if(not self.eat(Tag.SIMB_PONTO_VIRGULA)):
             self.sinalizaErroSintatico("Esperado\"(;)\"; encontrado" "+" "\""+ self.token.getLexema() + "\"")
+         
+         noCmdAtribui.getTipo() == noExpressao.getTipo()
 
       # Synch: FOLLOW de CmdAtribui
       else:
