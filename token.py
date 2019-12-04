@@ -1,3 +1,4 @@
+import Tag from tag
 class Token:
    '''
    Classe que representa um token
@@ -7,12 +8,16 @@ class Token:
       self.lexema = lexema
       self.linha = linha
       self.coluna = coluna
+      self.tipo = Tag.TIPOVAZIO
 
    def getNome(self):
       return self.nome
 
    def getLexema(self):
       return self.lexema
+   
+   def setTipo(self,tipo):
+      self.tipo = tipo
 
    def getLinha(self):
       return self.linha

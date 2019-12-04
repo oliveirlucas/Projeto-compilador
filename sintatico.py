@@ -4,6 +4,7 @@ from ts import TS
 from tag import Tag
 from token import Token
 from lexer import Lexer
+from no import No
 
 """
  * *
@@ -71,9 +72,9 @@ class Parser():
       if(self.eat(Tag.KW_CLASS)):
          
          if(not self.eat(Tag.ID)):
-            self.sinalizaErroSintatico("Esperado\"ID\"; encontrado" + "\""+ self.token.getLexema() + "\"")    
+            self.sinalizaErroSintatico("Esperado\"ID\"; encontrado" + "\""+ self.token.getLexema() + "\"")
          else:
-            self.lexer.ts.   
+
          
          if(not self.eat(Tag.SIMB_DOIS_PONTOS)):
             self.sinalizaErroSintatico("Esperado\":\"; encontrado" + "\""+ self.token.getLexema() + "\"")        
@@ -101,11 +102,15 @@ class Parser():
    # DeclaraID ->  TipoPrimitivo ID ";"
    def DeclareID(self):
       if(self.token.getNome() == Tag.KW_BOOL or self.token.getNome() == Tag.KW_INTEGER or self.token.getNome() == Tag.KW_STRING or self.token.getNome() == Tag.KW_DOUBLE or self.token.getNome() == Tag.KW_VOID):
-         self.TipoPrimitivo()
+         noTipoPrimitivo = self.TipoPrimitivo()
 
+         tempToken = copy.copy(self.token)
+         
          if(not self.eat(Tag.ID)):
             self.sinalizaErroSintatico("Esperado\"ID\"; encontrado" "+" "\""+ self.token.getLexema() + "\"")
-         
+         else:
+            self.lexer.ts.setTipo(tempToken.getLexema(), noTipoPrimitivo.getTipo())  
+
          if(not self.eat(Tag.SIMB_PONTO_VIRGULA)):
             self.sinalizaErroSintatico("Esperado\"(;)\"; encontrado" "+" "\""+ self.token.getLexema() + "\"")
 
@@ -169,7 +174,9 @@ class Parser():
          
          self.RegexDeclaraId()
          self.ListaCmd()
-         self.Retorno()
+
+         noRetorno = self.Retorno()
+         if(noRetorno)
 
          if(not self.eat(Tag.KW_END)):
             self.sinalizaErroSintatico("Esperado\"end\"; encontrado" "+" "\""+ self.token.getLexema() + "\"")
@@ -321,20 +328,26 @@ class Parser():
    
    # TipoPrimitivo → "bool"| "integer" | "String" | "double" | "void"
    def TipoPrimitivo(self):
+      noTipoPrimitivo = No()
+
       if(self.eat(Tag.KW_BOOL)):
-         return
+         noTipoPrimitivo.setTipo(Tag.TIPOLOGICO)
+         return noTipoPrimitivo
 
       elif(self.eat(Tag.KW_INTEGER)):
-         return
+         noTipoPrimitivo.setTipo(Tag.TIPONUMERICO)
+         return noTipoPrimitivo
       
       elif(self.eat(Tag.KW_STRING)):
-         return
+         noTipoPrimitivo.setTipo(Tag.TIPOSTRING)
+         return noTipoPrimitivo
       
       elif(self.eat(Tag.KW_DOUBLE)):
-         return
+         noTipoPrimitivo.setTipo(Tag.TIPONUMERICO)
+         return noTipoPrimitivo
 
       elif(self.eat(Tag.KW_VOID)):
-         return
+         return noTipoPrimitivo
       
       # Synch: FOLLOW de TipoPrimitivo
       else:

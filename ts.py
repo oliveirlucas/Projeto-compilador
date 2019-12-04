@@ -44,3 +44,15 @@ class TS:
    def printTS(self):
       for k, t in (self.ts.items()):
          print(k, ":", t.toString())
+
+   def setTipo(self,lexema,tipo):
+      self.ts[lexema].setTipo(lexema)
+
+    def getTipo(self,lexema):
+      token = self.ts.get(lexema)
+      if(token is None):
+         return None
+      else:
+         return token.getTipo()
+
+      
