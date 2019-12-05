@@ -48,7 +48,7 @@ class TS:
    def setTipo(self,lexema,tipo):
       self.ts[lexema].setTipo(lexema)
 
-    def getTipo(self,lexema):
+   def getTipo(self,lexema):
       token = self.ts.get(lexema)
       if(token is None):
          return None

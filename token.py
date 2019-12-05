@@ -1,4 +1,5 @@
-import Tag from tag
+from tag import Tag
+
 class Token:
    '''
    Classe que representa um token

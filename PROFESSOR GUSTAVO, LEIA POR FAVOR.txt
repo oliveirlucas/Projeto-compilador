@@ -1,0 +1,15 @@
+Gustavo,
+
+Após quebrar muito a cabeça segue alguns problemas que me deparei durante este trabalho.
+
+- Como na terça-feira você me ajudou inicialmente, depois de revisar o codigo varias vezes não consegui identificar os erro que está dando na semantica,
+o mesmo retorna um erro na implementação que você me ajudou na linha 56 da função "def getTipo(self,lexema)", o erro é apontado para o "return token.getTipo()"
+
+- Na gramatica no não terminal "EXPRESSAO" no seguinte trecho: "{se Exp’.t == vazio: Exp.t = Exp1.t; ":
+Como não existe na gramatica "Exp.t" interpretei que o mesmo seria "Exp’.t"
+
+- Como o codigo não rodou o mesmo estava dando erro, sendo assim como prioridade resolvi apenas terminar o codigo semantico seguindo a mesma logica
+
+- Para facilitar a avaliação o codigo "sintatico -RODANDO" e o arquivo com apenas a analise sintatica, o mesmo está rodando perfeitamente, o codigo "sintatico - SEMANTICO"
+e o codigo com a introdução da analise semantica 
+
