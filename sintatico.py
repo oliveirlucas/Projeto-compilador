@@ -273,9 +273,11 @@ class Parser():
    
    # Retorno → "return" Expressao ";" | ε 
    def Retorno(self):
+
+      noRetorno = No()
       if(self.eat(Tag.KW_RETURN)):
          
-         self.Expressao()
+         noExpressao = self.Expressao()
 
          if(not self.eat(Tag.SIMB_PONTO_VIRGULA)):
             self.sinalizaErroSintatico("Esperado\"(;)\"; encontrado" "+" "\""+ self.token.getLexema() + "\"")
@@ -376,6 +378,10 @@ class Parser():
                return self.TipoPrimitivo()
       return noTipoPrimitivo
 
+         return noTipoPrimitivo
+
+            
+
    # ListaCmd → ListaCmd’ 
    def ListaCmd(self):
       if(self.token.getNome() == Tag.KW_IF or self.token.getNome() == Tag.KW_WHILE or self.token.getNome() == Tag.ID or self.token.getNome() == Tag.KW_WRITE or self.token.getNome() == Tag.KW_RETURN):
@@ -446,13 +452,13 @@ class Parser():
 
       if(self.token.getNome() == Tag.OP_ATRIBUI):
          noCmdAtribui = self.CmdAtribui()
-      else:
-         noCmdAtribFunc == noCmdAtribui
+      
+         noCmdAtribFunc.setTipo(noCmdAtribui.getTipo())
       
       elif(self.token.getNome() == Tag.SIMB_ABRE_PARENTESES):
          self.CmdFuncao()
-      else:
-         noCmdAtribFunc == Tag.TIPOVAZIO
+      
+         noCmdAtribFunc.setTipo(Tag.TIPOVAZIO) 
 
       # Synch: FOLLOW de CmdAtribFunc
       else:
